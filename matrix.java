@@ -8,13 +8,15 @@ import java.util.Arrays;
 public class matrix extends preprocessing {
     
     
-    public static void writeFile(){
-        File myObj = new File("tfidf.txt");
+    public static void writeFile(String s){
+        File myObj = new File(s);
     }
 
-    public static void writeToFile(double[][] matrix){
+   
+
+    public static void writeToFile(double[][] matrix, String filea){
         try {
-            FileWriter myWriter = new FileWriter("tfidf.txt");
+            FileWriter myWriter = new FileWriter(filea);
             for(int i = 0; i < matrix.length; i++){
                 for(int j = 0; j < matrix[0].length;j++){
                     myWriter.write(Double.toString(matrix[i][j]));
@@ -23,7 +25,7 @@ public class matrix extends preprocessing {
                 myWriter.write("\n");
             }
             myWriter.close();
-            System.out.println("Successfully wrote to the file.");
+            //System.out.println("Successfully wrote to the file.");
           } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -31,7 +33,7 @@ public class matrix extends preprocessing {
 
     }
 
-    public static double[][] generateMatrix(){
+    public static double[][] generateMatrix(ArrayList<ArrayList<String>> fileArrays){
         
         for(ArrayList<String> list:fileArrays){
             for(String word:list){
@@ -49,8 +51,8 @@ public class matrix extends preprocessing {
                 //System.out.println(word);
             }
         }
-        System.out.println("size");
-        System.out.println(indexes.size());
+        //System.out.println("size");
+       // System.out.println(indexes.size());
         indexes.remove(wordList.indexOf("a"));
 
         int sizer = 0;
@@ -63,7 +65,7 @@ public class matrix extends preprocessing {
         //System.out.println("Word array list size :");
         //System.out.println(wordArrayList.size());
 
-        int finalMatrix[][] = new int[24][indexes.size()];
+        int finalMatrix[][] = new int[fileArrays.size()][indexes.size()];
         //System.out.println("Indexes size :");
         //System.out.println(indexes.size());
 
@@ -79,32 +81,101 @@ public class matrix extends preprocessing {
         }
         //printMyMatrix(finalMatrix);
         //idf(wordArrayList);
-        double[][] returnMatrix = tdidf(tf(wordArrayList),idf(wordArrayList), wordArrayList);
-        writeFile();
-        writeToFile(returnMatrix);
+        double[][] returnMatrix = tdidf(tf(wordArrayList,fileArrays,false),idf(wordArrayList, fileArrays,false,false), wordArrayList);
+        writeFile("tfidf.txt");
+        writeToFile(returnMatrix,"tfidf.txt");
+        //generateKeyWords(returnMatrix, indexes, wordList);
+        return returnMatrix;
+    }
+    public static double[][] generateMatrixNoCreate(ArrayList<ArrayList<String>> fileArrays){
+        
+        int sizer = 0;
+        final String words[] = new String[indexes.size()];
+        for(Integer i:indexes){
+            words[sizer] = wordList.get(i);
+            sizer++;
+        }
+        ArrayList<String> wordArrayList = new ArrayList<String>(Arrays.asList(words));
+        //System.out.println("Word array list size :");
+        //System.out.println(wordArrayList.size());
+
+        int finalMatrix[][] = new int[fileArrays.size()][indexes.size()];
+        //System.out.println("Indexes size :");
+        //System.out.println(indexes.size());
+
+        int indexForFile = 0;
+
+        for(ArrayList<String> list:fileArrays){
+            for(String word:list){
+                if(wordArrayList.contains(word)){
+                    finalMatrix[indexForFile][wordArrayList.indexOf(word)] += 1;
+                } 
+            }
+            indexForFile++;
+        }
+        //printMyMatrix(finalMatrix);
+        //idf(wordArrayList);
+        double[][] returnMatrix = tdidf(tf(wordArrayList,fileArrays,false),idf(wordArrayList,fileArrays,true,false), wordArrayList);
+        writeFile("tfidf1.txt");
+        writeToFile(returnMatrix,"tfidf1.txt");
+        //generateKeyWords(returnMatrix, indexes, wordList);
+        return returnMatrix;
+    }
+
+    public static double[][] genVec(ArrayList<ArrayList<String>> singleUseless){
+        
+        int sizer = 0;
+        final String words[] = new String[indexes.size()];
+        for(Integer i:indexes){
+            words[sizer] = wordList.get(i);
+            sizer++;
+        }
+        ArrayList<String> wordArrayList = new ArrayList<String>(Arrays.asList(words));
+        //System.out.println("Word array list size :");
+        //System.out.println(wordArrayList.size());
+
+        int finalMatrix[][] = new int[singleUseless.size()][indexes.size()];
+        //System.out.println("Indexes size :");
+        //System.out.println(indexes.size());
+
+        int indexForFile = 0;
+
+        for(ArrayList<String> list:singleUseless){
+            for(String word:list){
+                if(wordArrayList.contains(word)){
+                    finalMatrix[indexForFile][wordArrayList.indexOf(word)] += 1;
+                } 
+            }
+            indexForFile++;
+        }
+        //printMyMatrix(finalMatrix);
+        //idf(wordArrayList);
+        double[][] returnMatrix = tdidf(tf(wordArrayList,singleUseless, true),idf(wordArrayList,singleUseless,true,true), wordArrayList);
+        writeFile("tfidf2.txt");
+        writeToFile(returnMatrix,"tfidf2.txt");
+        //generateKeyWords(returnMatrix, indexes, wordList);
         return returnMatrix;
     }
 
 
-    public static double[][] tf(ArrayList<String> wordArrayList){
-        double newMatrix[][] = new double[24][wordArrayList.size()];
+    public static double[][] tf(ArrayList<String> wordArrayList, ArrayList<ArrayList<String>> arrayX, boolean b) {
+        double newMatrix[][] = new double[arrayX.size()][wordArrayList.size()];
         int goodOldCounter = 0;
         for(String keyword:wordArrayList){
             
             int indexForFile = 0;
-            for(ArrayList<String> list:fileArrays){
+            for(ArrayList<String> list:arrayX){
                 int fileWordCount = list.size();
                 for(String word:list){
                     if(word.equals(keyword)){
                         goodOldCounter++;
                     }
                 }
-                if(fileArrays.indexOf(list) == 0 & keyword.equals("aviat")){
-                    //System.out.print("This is the count of aviat");
-                    //System.out.println(goodOldCounter);
-
-                }
                 newMatrix[indexForFile][wordArrayList.indexOf(keyword)] = goodOldCounter / (double) fileWordCount;
+                if(b){
+                    //System.out.println(goodOldCounter / (double) fileWordCount);
+                }
+
                 indexForFile++;
                 goodOldCounter = 0;
             }
@@ -115,11 +186,12 @@ public class matrix extends preprocessing {
         return newMatrix;
     }
 
-    public static double[] idf(ArrayList<String> wordArrayList){
+    public static double[] idf(ArrayList<String> wordArrayList, ArrayList<ArrayList<String>> arrayX,boolean flag,
+            boolean b) {
         double newMatrix[] = new double[wordArrayList.size()];
         for(String keyword:wordArrayList){
             int currentCount = 0;
-            for(ArrayList<String> list:fileArrays){
+            for(ArrayList<String> list:arrayX){
                 int fileChecker = 0;
                 for(String word:list){
                     if(word.equals(keyword) & fileChecker == 0){
@@ -129,13 +201,20 @@ public class matrix extends preprocessing {
                 }
                 fileChecker = 0;
             }
-            newMatrix[wordArrayList.indexOf(keyword)] = Math.log(24/(double)currentCount);
+            if(flag){
+                currentCount++;
+            }
+            
+            newMatrix[wordArrayList.indexOf(keyword)] = Math.log(25/(double)currentCount);
+            if(b){
+                //System.out.println(currentCount);
+            }
         }
         return newMatrix;
     }
 
     public static double[][] tdidf(double[][] matrix, double[] row,ArrayList<String> wordArrayList){
-        double newMatrix[][] = new double[24][wordArrayList.size()];
+        double newMatrix[][] = new double[matrix.length][wordArrayList.size()];
         for(int i = 0; i<matrix.length; i++){
             for(int j = 0; j<matrix[i].length; j++){
                 newMatrix[i][j] = matrix[i][j] * row[j];

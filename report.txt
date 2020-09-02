@@ -1,0 +1,13 @@
+The program thought document -unknown/unknown01.txt- belonged in cluster: C1
+Percent C1: 100.0%
+Percent C4: 0.0%
+Percent C7: 0.0%
+Confusion Matrix: 
+
+
+                    True                False               Precision           
+Tested True         8                   0                   100.0               
+Tested false        0                   16                  100.0               
+Recall              100.0               100.0               
+
+

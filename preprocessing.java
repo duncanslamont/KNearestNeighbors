@@ -24,7 +24,7 @@ public class preprocessing extends headquarters {
           }
           return stopWords;
     }
-    public static void dataPreparation(int i){
+    public static void dataPreparation(int i, String[] fileNames, ArrayList<ArrayList<String>> fileArrays){
         try {
             File fileObject = new File(fileNames[i]);
             Scanner myReader = new Scanner(fileObject);
@@ -55,6 +55,40 @@ public class preprocessing extends headquarters {
             e.printStackTrace();
         }
     }
+
+    public static void dataPreparationSingle(String fileName, ArrayList<String> fileArray){
+        try {
+            File fileObject = new File(fileName);
+            Scanner myReader = new Scanner(fileObject);
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                ArrayList<String> line = new ArrayList<String>(Arrays.asList(data.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+"))); 
+                // Removal of stop words
+                line.removeAll(stopWords); 
+                // Stemming and lemmatizatoin (using the porter stemmer)
+                int k = 0;
+                for(String word:line){
+                    char[] ch = new char[word.length()]; 
+                    for (int j = 0; j < word.length(); j++) { 
+                        ch[j] = word.charAt(j); 
+                    } 
+                    Stemmer stemmer = new Stemmer();
+                    stemmer.add(ch,word.length());
+                    stemmer.stem();
+                    String str = stemmer.toString();
+                    line.set(k, str);
+                    k++;
+                }
+                fileArray.addAll(line);
+            }
+            //System.out.println("Successfully did it");
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
     }
 }

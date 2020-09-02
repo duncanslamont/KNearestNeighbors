@@ -1,12 +1,19 @@
 
-This is the clustering algorithm of Duncan Lamont. NYU net Id: DL3833. N#19122868. 
-The only code that is not mine is the code in the file Stemmer.java. This was downloaded 
-from the official Porter stemmer website:https://tartarus.org/martin/PorterStemmer/java.txt
-This is the only code that is not mine, everything else I made. 
+This is the KNN algorithm of Duncan Lamont. NYU net Id: DL3833. N#19122868. 
+
+This program uses the latest version of java, I've encountered some errors running it on other machines that do not
+have the latest version of java, I'm not sure why.
+
+I used the official Porter stemmer to stem the text files. Website:https://tartarus.org/martin/PorterStemmer/java.txt
+ 
 
 HOW TO RUN THE PROGRAM:
+Go to the folder where the project is contained in terminal. Type:
+javac headquarters.java
+Then:
+java headquarters
+It will then prompt you to enter in a file path.
 
-Throughout the code there
-are various test functions I used to make sure that everything was working correctly.
-Many of these functions are commented out, or not explained. Most of the important 
-functions I explained their purpose.
+The results are in report.txt, the results of a previous run are in that file now, just in case it doesn't work on your
+machine and you want an example.
+
